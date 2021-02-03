@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+</head>
+
+<body>
+    <button class="btn">提交</button>
+    <script>
+        const ajax = function (option) {
+            const extendAjax = {
+                mothed: 'get',
+                url: '',
+                data: {},
+                header: {
+                    type: 'application/x-www-form-urlencoded'
+                },
+                success: function () {
+                },
+                error: function () {
+                }
+            }
+            Object.assign(extendAjax, option);
+            const xml = new XMLHttpRequest();
+            let str = '';
+            for (let k in extendAjax.data) {
+                str = str + k + '=' + extendAjax.data[k] + '&';
+            }
+            str = str.substr(0, str.length - 1);
+            str = '?' + str;
+            if (extendAjax.mothed == 'post') {
+                xml.open(extendAjax.mothed, extendAjax.url);
+                if (extendAjax.header.type == 'application/json') {
+                    xml.setRequestHeader('Content-Type', extendAjax.header.type);
+                    xml.send(JSON.stringify(extendAjax.data));
+                } else {
+                    xml.setRequestHeader('Content-Type', extendAjax.header.type);
+                    xml.send(extendAjax.data);
+                };
+            } else {
+                xml.open(extendAjax.mothed, extendAjax.url + str);
+                xml.send();
+            };
+            xml.onload = function () {
+                let text = xml.responseText;
+                if (xml.getResponseHeader('Content-Type').includes('application/json')) {
+                    text = JSON.parse(xml.responseText);
+                }
+                if (xml.status === 200) {
+                    extendAjax.success(text, xml);
+                } else {
+                    extendAjax.error(text, xml);
+                };
+            };
+        };
+
+        ajax({
+            url: 'http://127.0.0.1:3000/',
+            data: {
+                uname: 'miles',
+                age: '19'
+            },
+            success: function (data, xml) {
+                console.log(data);
+                console.log(xml);
+            },
+            error: function (data, xml) {
+                console.log(data);
+                console.log(xml);
+            }
+        });
+    </script>
+</body>
+
+</html>

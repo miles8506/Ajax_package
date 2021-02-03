@@ -5,73 +5,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-
 </head>
 
 <body>
     <script>
-        const ajax = function (option) {
-            const extendAjax = {
+        const ajax = (option) => {
+            let extendAjax = {
                 mothed: 'get',
                 url: '',
                 data: {},
                 header: {
                     type: 'application/x-www-form-urlencoded'
                 },
-                success: function () {
-                },
-                error: function () {
-                }
-            }
+                success: (data) => { },
+                error: (data) => { }
+            };
             Object.assign(extendAjax, option);
             const xml = new XMLHttpRequest();
             let str = '';
             for (let k in extendAjax.data) {
-                str = str + k + '=' + extendAjax.data[k] + '&';
-            }
-            str = str.substr(0, str.length - 1);
-            str = '?' + str;
+                str += k + '=' + extendAjax.data[k] + '&';
+            };
+            str = '?' + str.substr(0, str.length - 1);
             if (extendAjax.mothed == 'post') {
                 xml.open(extendAjax.mothed, extendAjax.url);
-                if (extendAjax.header.type == 'application/json') {
-                    xml.setRequestHeader('Content-Type', extendAjax.header.type);
+                xml.setRequestHeader('Content-Type', extendAjax.header.type)
+                if (extendAjax.header.type === 'application/json') {
                     xml.send(JSON.stringify(extendAjax.data));
                 } else {
-                    xml.setRequestHeader('Content-Type', extendAjax.header.type);
                     xml.send(extendAjax.data);
                 };
             } else {
                 xml.open(extendAjax.mothed, extendAjax.url + str);
                 xml.send();
             };
-            xml.onload = function () {
-                let text = xml.responseText;
-                if (xml.getResponseHeader('Content-Type').includes('application/json')) {
-                    text = JSON.parse(xml.responseText);
-                }
+            xml.onload = () => {
                 if (xml.status === 200) {
-                    extendAjax.success(text, xml);
+                    if (xml.getResponseHeader('Content-Type').includes('application/json')) {
+                        extendAjax.success(JSON.parse(xml.responseText));
+                    } else {
+                        extendAjax.success(xml.responseText);
+                    };
                 } else {
-                    extendAjax.error(text, xml);
+                    extendAjax.error(xml.responseText, xml);
                 };
             };
         };
-
         ajax({
             url: 'http://127.0.0.1:3000/',
             data: {
                 uname: 'miles',
-                age: '19'
+                age: 20,
+                sex: '男'
             },
-            success: function (data, xml) {
+            success: (data) => {
                 console.log(data);
-                console.log(xml);
             },
-            error: function (data, xml) {
+            error: (data) => {
                 console.log(data);
                 console.log(xml);
             }
-        });
+        })
     </script>
 </body>
 

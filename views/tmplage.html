@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>信箱驗證</title>
+    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <style type="text/css">
+        p:not(:empty) {
+            padding: 15px;
+        }
+
+        .container {
+            padding-top: 100px;
+        }
+    </style>
+    <style>
+        .success {
+            width: 300px;
+            height: 50px;
+            background-color: rgb(96, 180, 96);
+            color: #ffffff;
+        }
+
+        .false {
+            width: 300px;
+            height: 50px;
+            background-color: rgb(218, 71, 71);
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-group">
+            <label>信箱</label>
+            <input type="email" class="form-control" placeholder="請輸入信箱" id="email">
+        </div>
+        <p id="info"></p>
+    </div>
+    <script src="/public/ajax.js"></script>
+    <script>
+        const emailipt = document.querySelector('#email');
+        const info = document.querySelector('#info');
+        emailipt.addEventListener('blur', function () {
+            const val = this.value;
+            var reg = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/;
+            if (!reg.test(val)) {
+                info.className = 'false';
+                info.innerHTML = '信箱格式錯誤';
+                return;
+            }
+            ajax({
+                url: 'http://127.0.0.1:3000/email',
+                data: {
+                    email: val
+                },
+                success: (data, xml) => {
+                    if (xml.responseText === '該信箱已被註冊') {
+                        info.className = 'false';
+                        info.innerHTML = xml.responseText;
+                        return
+                    } else if (xml.responseText === '信箱可使用') {
+                        info.className = 'success';
+                        info.innerHTML = xml.responseText;
+                    };
+                },
+                error: (data) => {
+                    console.log(data);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
